@@ -1,0 +1,109 @@
+// MIT License
+// Copyright (c) 2026 Jayadev Rana
+//
+// Educational TradingView Pine Script example.
+// This script demonstrates common Pine plotting tools using a simple SMA trend overlay.
+//@version=6
+indicator("SMA Plot Toolbox - Jayadev Rana", overlay = true)
+
+// User controls for the two moving averages.
+fastLength = input.int(9, "Fast SMA Length", minval = 1)
+slowLength = input.int(21, "Slow SMA Length", minval = 1)
+showPlotBarDemo = input.bool(false, "Show plotbar() Demo")
+showPlotCandleDemo = input.bool(false, "Show plotcandle() Demo")
+
+// Fixed chart reference levels used as a visual hline() example.
+upperReference = hline(280, "Upper Reference", color = color.new(color.gray, 20))
+lowerReference = hline(260, "Lower Reference", color = color.new(color.gray, 20))
+
+// Core calculations.
+fastSma = ta.sma(close, fastLength)
+slowSma = ta.sma(close, slowLength)
+
+// Main line plots. The plot IDs are reused by fill().
+fastPlot = plot(fastSma, "Fast SMA", color = color.aqua, linewidth = 2)
+slowPlot = plot(slowSma, "Slow SMA", color = color.orange, linewidth = 2)
+
+// Cross conditions for markers and visual signals.
+bullCross = ta.crossover(fastSma, slowSma)
+bearCross = ta.crossunder(fastSma, slowSma)
+
+plotshape(
+     bullCross,
+     title = "Bull Cross",
+     style = shape.triangleup,
+     location = location.belowbar,
+     color = color.lime,
+     size = size.tiny,
+     text = "BUY",
+     textcolor = color.white
+)
+
+plotshape(
+     bearCross,
+     title = "Bear Cross",
+     style = shape.triangledown,
+     location = location.abovebar,
+     color = color.red,
+     size = size.tiny,
+     text = "SELL",
+     textcolor = color.white
+)
+
+// plotchar() is useful for compact condition markers.
+strongBull = close > fastSma and close > slowSma
+plotchar(
+     strongBull,
+     title = "Strength Marker",
+     char = "*",
+     location = location.top,
+     color = color.yellow,
+     size = size.tiny
+)
+
+// plotarrow() uses the sign and size of a number.
+momentum = fastSma - slowSma
+plotarrow(
+     momentum,
+     title = "Momentum Arrows",
+     colorup = color.teal,
+     colordown = color.fuchsia,
+     minheight = 10,
+     maxheight = 25
+)
+
+// Fill the space between the moving averages.
+trendFill = fastSma >= slowSma ? color.new(color.green, 88) : color.new(color.red, 88)
+fill(fastPlot, slowPlot, trendFill, title = "Trend Fill")
+fill(upperReference, lowerReference, color.new(color.silver, 94), title = "Reference Zone")
+
+// barcolor() changes the chart candles themselves.
+barcolor(
+     fastSma >= slowSma ? color.new(color.green, 0) : color.new(color.red, 0),
+     title = "Trend Bar Color"
+)
+
+// bgcolor() gives a softer trend cue behind the candles.
+bgcolor(strongBull ? color.new(color.green, 92) : na, title = "Bull Background")
+
+// Optional whole-bar and whole-candle demos show the functions without cluttering the default view.
+demoBarColor = close >= open ? color.new(color.blue, 70) : color.new(color.purple, 70)
+plotbar(
+     showPlotBarDemo ? open : na,
+     showPlotBarDemo ? high : na,
+     showPlotBarDemo ? low : na,
+     showPlotBarDemo ? close : na,
+     title = "plotbar() Demo",
+     color = demoBarColor
+)
+
+plotcandle(
+     showPlotCandleDemo ? open : na,
+     showPlotCandleDemo ? high : na,
+     showPlotCandleDemo ? low : na,
+     showPlotCandleDemo ? close : na,
+     title = "plotcandle() Demo",
+     color = demoBarColor,
+     wickcolor = color.gray,
+     bordercolor = color.black
+)

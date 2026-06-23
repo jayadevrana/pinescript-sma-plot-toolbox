@@ -23,7 +23,7 @@ It is useful for traders learning Pine Script basics and for developers who want
 
 1. Open TradingView.
 2. Go to the Pine Editor.
-3. Copy the code from `sma_plot_toolbox.pine`.
+3. Copy the code from `sma_plot_toolbox.txt`.
 4. Paste it into the Pine Editor.
 5. Save the script.
 6. Click Add to chart.
